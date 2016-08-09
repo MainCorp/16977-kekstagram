@@ -109,6 +109,7 @@
       // Отрисовка изображения на холсте. Параметры задают изображение, которое
       // нужно отрисовать и координаты его верхнего левого угла.
       // Координаты задаются от центра холста.
+
       this._ctx.drawImage(this._image, displX, displY);
 
       // Отрисовка прямоугольника, обозначающего область изображения после
@@ -118,6 +119,32 @@
           (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2,
           this._resizeConstraint.side - this._ctx.lineWidth / 2,
           this._resizeConstraint.side - this._ctx.lineWidth / 2);
+
+      var coordinateSquareX = (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2 - this._ctx.lineWidth;
+      var coordinateSquareY = (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2 - this._ctx.lineWidth;
+      var coordinateSquareAspect = (this._resizeConstraint.side - this._ctx.lineWidth / 2) / 2;
+
+      this._ctx.beginPath();
+      this._ctx.moveTo(coordinateSquareX, coordinateSquareY);
+      this._ctx.lineTo(coordinateSquareAspect, coordinateSquareY);
+      this._ctx.lineTo(coordinateSquareAspect, coordinateSquareAspect);
+      this._ctx.lineTo(coordinateSquareX, coordinateSquareAspect);
+      this._ctx.lineTo(coordinateSquareX, coordinateSquareY);
+
+      this._ctx.moveTo(-this._container.width / 2, -this._container.height / 2);
+      this._ctx.lineTo(this._container.width, -this._container.height / 2);
+      this._ctx.lineTo(this._container.width, this._container.height);
+      this._ctx.lineTo(-this._container.width / 2, this._container.height);
+      this._ctx.lineTo(-this._container.width / 2, -this._container.height / 2);
+      this._ctx.closePath();
+
+      this._ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      this._ctx.fill('evenodd');
+
+      this._ctx.textAlign = 'center';
+      this._ctx.font = '20px Arial';
+      this._ctx.fillStyle = '#fff';
+      this._ctx.fillText( this._image.naturalWidth + ' x ' + this._image.naturalHeight, 0, coordinateSquareY - this._ctx.lineWidth);
 
       // Восстановление состояния канваса, которое было до вызова ctx.save
       // и последующего изменения системы координат. Нужно для того, чтобы
