@@ -1,3 +1,2 @@
-build/js/*.min.js
-bin/
-tests/
+src/check.js
+src/*.min.js
