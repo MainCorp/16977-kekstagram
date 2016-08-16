@@ -40,6 +40,19 @@
    * @type {Resizer}
    */
   var currentResizer;
+  var collectionResizeForm = document.getElementById('upload-resize').elements;
+  var resizeLeftSide = collectionResizeForm['resize-x'];
+  var resizeOnTopSide = collectionResizeForm['resize-y'];
+  var resizeSize = collectionResizeForm['resize-size'];
+  var resizeBtn = collectionResizeForm['resize-fwd'];
+
+  resizeLeftSide.min = 0;
+  resizeOnTopSide.min = 0;
+  resizeSize.min = 0;
+  resizeLeftSide.value = 0;
+  resizeOnTopSide.value = 0;
+  resizeSize.value = 0;
+
 
   /**
    * Удаляет текущий объект {@link Resizer}, чтобы создать новый с другим
@@ -71,9 +84,22 @@
    * Проверяет, валидны ли данные, в форме кадрирования.
    * @return {boolean}
    */
+
   function resizeFormIsValid() {
-    return true;
+    var size = parseInt(resizeSize.value, 10);
+    var left = parseInt(resizeLeftSide.value, 10);
+    var top = parseInt(resizeOnTopSide.value, 10);
+    var validLeftSide = (left + size <= currentResizer._image.naturalWidth);
+    var validTopSide = (top + size <= currentResizer._image.naturalHeight);
+
+    resizeBtn.disabled = !validLeftSide || !validTopSide;
   }
+
+  resizeLeftSide.oninput = resizeFormIsValid;
+
+  resizeOnTopSide.oninput = resizeFormIsValid;
+
+  resizeSize.oninput = resizeFormIsValid;
 
   /**
    * Форма загрузки изображения.
@@ -192,7 +218,6 @@
    */
   resizeForm.onsubmit = function(evt) {
     evt.preventDefault();
-
     if (resizeFormIsValid()) {
       var image = currentResizer.exportImage().src;
 

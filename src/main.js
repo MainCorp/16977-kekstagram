@@ -2,4 +2,3 @@
 
 require('./resizer');
 require('./upload');
-require('./form');
