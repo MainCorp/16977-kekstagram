@@ -8,6 +8,9 @@
 'use strict';
 
 (function() {
+  /* Подключение библиотеки browser-cookies */
+  var browserCookies = require('browser-cookies');
+
   /** @enum {string} */
   var FileType = {
     'GIF': '',
@@ -93,12 +96,12 @@
     var validTopSide = (top + size <= currentResizer._image.naturalHeight);
 
     resizeBtn.disabled = !validLeftSide || !validTopSide;
+
+    return true;
   }
 
   resizeLeftSide.oninput = resizeFormIsValid;
-
   resizeOnTopSide.oninput = resizeFormIsValid;
-
   resizeSize.oninput = resizeFormIsValid;
 
   /**
@@ -196,6 +199,27 @@
     }
   };
 
+  var collectionFilterForm = filterForm['upload-filter'];
+  var defaultFilter = collectionFilterForm.value;
+  collectionFilterForm.value = browserCookies.get('upload-filter') || defaultFilter;
+
+   /* Запись в куки выбранный пользователем фильтр */
+
+  function getDays(date) {
+    var nowYear = date.getFullYear();
+    var lastYear = nowYear - 1;
+    var birthdayHopperGrace = new Date(nowYear, 11, 9);
+    var ms = (24 * 60 * 60 * 1000);
+
+    if (date < birthdayHopperGrace) {
+      birthdayHopperGrace = new Date(lastYear, 11, 9);
+    }
+
+    var calcDate = (date - birthdayHopperGrace) / ms;
+
+    return calcDate;
+  }
+
   /**
    * Обработка сброса формы кадрирования. Возвращает в начальное состояние
    * и обновляет фон.
@@ -249,9 +273,11 @@
    * записав сохраненный фильтр в cookie.
    * @param {Event} evt
    */
+
   filterForm.onsubmit = function(evt) {
     evt.preventDefault();
 
+    browserCookies.set('upload-filter', collectionFilterForm.value, {expires: getDays(new Date())});
     cleanupResizer();
     updateBackground();
 
