@@ -1,5 +1,3 @@
-/* global Resizer: true */
-
 /**
  * @fileoverview
  * @author Igor Alexeenko (o0)
@@ -7,9 +5,7 @@
 
 'use strict';
 
-(function() {
-  /* Подключение библиотеки browser-cookies */
-  var browserCookies = require('browser-cookies');
+define(['./resizer', 'browser-cookies'], function(Resizer, browserCookies) {
 
   /** @enum {string} */
   var FileType = {
@@ -314,4 +310,4 @@
 
   cleanupResizer();
   updateBackground();
-})();
+});
