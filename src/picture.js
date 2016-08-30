@@ -7,7 +7,7 @@
  * @property {String} url
  */
 
-define(['./load-image'], function(loadImage) {
+define(['./load-image', './gallery'], function(loadImage, Gallery) {
   var templateElement = document.querySelector('#picture-template');
   var elementToClone;
 
@@ -16,7 +16,7 @@ define(['./load-image'], function(loadImage) {
    * @param {Picture} data информация о картинке
    * @return {HTMLElement} picture DOM элемент
    */
-  function getPictureElement(data) {
+  function getPictureElement(data, index) {
     var picture = elementToClone.cloneNode(true);
     var pictureImg = picture.querySelector('img');
 
@@ -31,6 +31,11 @@ define(['./load-image'], function(loadImage) {
       } else {
         picture.classList.add('picture-load-failure');
       }
+    });
+
+    picture.addEventListener('click', function(evt) {
+      evt.preventDefault();
+      Gallery.show(index);
     });
 
     return picture;
