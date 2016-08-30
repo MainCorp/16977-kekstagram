@@ -1,5 +1,5 @@
 'use strict';
-define(['./load', './picture'], function(callJsonp, getPictureElement) {
+define(['./load', './picture', './gallery'], function(callJsonp, getPictureElement, Gallery) {
 
   var picturesContainer = document.querySelector('.pictures');
   var filters = document.querySelector('.filters');
@@ -11,11 +11,13 @@ define(['./load', './picture'], function(callJsonp, getPictureElement) {
   function showPictures(pictures) {
     var fragment = document.createDocumentFragment();
 
-    pictures.forEach(function(picture) {
-      fragment.appendChild(getPictureElement(picture));
+    pictures.forEach(function(picture, i) {
+      fragment.appendChild(getPictureElement(picture, i));
     });
 
     picturesContainer.appendChild(fragment);
+
+    Gallery.setPictures(pictures);
     filters.classList.remove('hidden');
   }
 
