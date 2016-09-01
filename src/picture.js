@@ -16,30 +16,36 @@ define(['./load-image', './gallery'], function(loadImage, Gallery) {
    * @param {Picture} data информация о картинке
    * @return {HTMLElement} picture DOM элемент
    */
-  function getPictureElement(data, index) {
-    var picture = elementToClone.cloneNode(true);
-    var pictureImg = picture.querySelector('img');
+  var Picture = function(data, index) {
+    var self = this;
+    this.data = data;
+    this.element = elementToClone.cloneNode(true);
+    this.pictureImg = this.element.querySelector('img');
 
-    picture.querySelector('.picture-comments').textContent = data.comments;
-    picture.querySelector('.picture-likes').textContent = data.likes;
+    this.element.querySelector('.picture-comments').textContent = this.data.comments;
+    this.element.querySelector('.picture-likes').textContent = this.data.likes;
 
     loadImage(data.url, function(isImageLoaded) {
       if (isImageLoaded === true) {
-        pictureImg.src = data.url;
-        pictureImg.width = 182;
-        pictureImg.height = 182;
+        self.pictureImg.src = data.url;
+        self.pictureImg.width = 182;
+        self.pictureImg.height = 182;
       } else {
-        picture.classList.add('picture-load-failure');
+        self.element.classList.add('picture-load-failure');
       }
     });
 
-    picture.addEventListener('click', function(evt) {
+    this.onSwitchActiviyGallery = function(evt) {
       evt.preventDefault();
       Gallery.show(index);
-    });
+    };
 
-    return picture;
-  }
+    this.element.addEventListener('click', this.onSwitchActiviyGallery);
+  };
+
+  Picture.prototype.remove = function() {
+    this.element.removeEventListener('click', this.onSwitchActiviyGallery);
+  };
 
   if ('content' in templateElement) {
     elementToClone = templateElement.content.querySelector('.picture');
@@ -47,5 +53,5 @@ define(['./load-image', './gallery'], function(loadImage, Gallery) {
     elementToClone = templateElement.querySelector('.picture');
   }
 
-  return getPictureElement;
+  return Picture;
 });
