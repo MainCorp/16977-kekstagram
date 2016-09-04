@@ -368,7 +368,7 @@ input[type=radio]:checked + .upload-filter-label .upload-filter-preview {
 }
 
 .pictures {
-  padding-bottom: 120px;
+  padding-bottom: 300px;
   padding-left: 12px;
 
   font-size: 0;
