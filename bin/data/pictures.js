@@ -18,18 +18,21 @@ const preprocessRec = (timestamp, rec) => {
   }, rec);
 };
 
+var preprocessedData;
 
 module.exports = {
   read: (filterID, from, to) => {
     from = typeof from === 'undefined' ? -Infinity : from;
     to = typeof to === 'undefined' ? Infinity : to;
 
-    let fileContent = fs.readFileSync(path.resolve(__dirname, 'pictures.json'), 'utf-8');
-    let data = JSON.parse(fileContent);
+    if ( ! preprocessedData) {
+      let fileContent = fs.readFileSync(path.resolve(__dirname, 'pictures.json'), 'utf-8');
+      let data = JSON.parse(fileContent);
 
-    let preprocessedData = data.map(rec => preprocessRec(
-      getRandTimestampInRange(twoWeeks),
-      rec));
+      preprocessedData = data.map(rec => preprocessRec(
+        getRandTimestampInRange(twoWeeks),
+        rec));
+    }
 
     return new Promise((resolve, reject) => {
       try {

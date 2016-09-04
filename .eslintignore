@@ -1,4 +1,4 @@
 bin/server.js
-bin/data/reviews.js
+bin/data/pictures.js
 src/check.js
 src/*.min.js
