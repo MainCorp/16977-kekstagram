@@ -1,27 +1,28 @@
 'use strict';
 
 define(function() {
-  callJsonp.counter = 0;
-
   /**
-   * Делает JSONp запрос
+   * Делает XMLHttpRequest запрос
    * @param {String} url адрес запроса
+   * @param {Object} courier
    * @param {Function} callback функция обработки данных
    */
-  function callJsonp(url, callback) {
-    var cbnum = 'cb' + callJsonp.counter++;
+  function load(url, courier, callback) {
+    var xhr = new XMLHttpRequest();
+    var getParams = Object.keys(courier);
 
-    var script = document.createElement('script');
-    script.src = url + '?callback=' + cbnum;
-    document.body.appendChild(script);
+    var newUrl = getParams.map(function(value) {
+      return value + '=' + courier[value];
+    });
 
-    window[cbnum] = function(data) {
-      callback(data);
+    xhr.open('GET', url + '?' + newUrl.join('&'));
+    xhr.send();
+    xhr.onload = function() {
+      var loadXHR = JSON.parse(xhr.response);
 
-      document.body.removeChild(script);
-      delete window[cbnum];
+      callback(loadXHR);
     };
   }
 
-  return callJsonp;
+  return load;
 });
