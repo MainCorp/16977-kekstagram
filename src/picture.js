@@ -17,8 +17,8 @@ define(['./load-image', './gallery'], function(loadImage, Gallery) {
    * @return {HTMLElement} picture DOM элемент
    */
   var Picture = function(data, index) {
-    var self = this;
     this.data = data;
+    this.index = index;
     this.element = elementToClone.cloneNode(true);
     this.pictureImg = this.element.querySelector('img');
 
@@ -27,18 +27,18 @@ define(['./load-image', './gallery'], function(loadImage, Gallery) {
 
     loadImage(data.url, function(isImageLoaded) {
       if (isImageLoaded === true) {
-        self.pictureImg.src = data.url;
-        self.pictureImg.width = 182;
-        self.pictureImg.height = 182;
+        this.pictureImg.src = data.url;
+        this.pictureImg.width = 182;
+        this.pictureImg.height = 182;
       } else {
-        self.element.classList.add('picture-load-failure');
+        this.element.classList.add('picture-load-failure');
       }
-    });
+    }.bind(this));
 
     this.onSwitchActiviyGallery = function(evt) {
       evt.preventDefault();
-      Gallery.show(index);
-    };
+      Gallery.show(this.index);
+    }.bind(this);
 
     this.element.addEventListener('click', this.onSwitchActiviyGallery);
   };

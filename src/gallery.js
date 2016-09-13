@@ -28,19 +28,15 @@ define(function() {
   Gallery.prototype.show = function(num) {
     this.setActivePicture(num);
 
-    var self = this;
-
-    this.galleryClose.onclick = function() {
-      self.hide();
-    };
+    this.galleryClose.onclick = this.hide.bind(this);
 
     this.galleryImage.onclick = function() {
-      if (self.activePicture < self.pictures.length - 1) {
-        self.setActivePicture(self.activePicture + 1);
+      if (this.activePicture < this.pictures.length - 1) {
+        this.setActivePicture(this.activePicture + 1);
       } else {
-        self.setActivePicture(0);
+        this.setActivePicture(0);
       }
-    };
+    }.bind(this);
 
     this.galleryOverlay.classList.remove('invisible');
   };
@@ -50,7 +46,6 @@ define(function() {
    */
   Gallery.prototype.hide = function() {
     this.galleryOverlay.classList.add('invisible');
-
     this.galleryClose.onclick = null;
     this.galleryImage.onclick = null;
   };
