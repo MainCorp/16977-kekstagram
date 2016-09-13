@@ -86,6 +86,11 @@ define(['./load', './picture', './gallery'], function(load, Picture, Gallery) {
     load('http://localhost:1506/api/pictures', param, showPictures);
   }
 
+  function setStorageFilter() {
+    filterValue = localStorage.getItem('filter') || 'filter-popular';
+    filters.elements['filter-' + filterValue].checked = true;
+  }
+
   filters.classList.add('hidden');
   loadPictures();
 
@@ -93,10 +98,13 @@ define(['./load', './picture', './gallery'], function(load, Picture, Gallery) {
     if (event.target.tagName.toLowerCase() === 'input') {
       currentPage = 0;
       filterValue = evt.target.value;
+      localStorage.setItem('filter', filterValue);
       picturesContainer.innerHTML = '';
       loadPictures();
     }
   }, true);
 
   window.addEventListener('scroll', checkPosition);
+
+  return setStorageFilter();
 });
