@@ -14,11 +14,24 @@ define(['./load', './picture', './gallery'], function(load, Picture, Gallery) {
   var PAGE_SIZE = 12;
   var GAP = 100;
 
+  var Pictures = function() {
+    this.checkPosition = this.checkPosition.bind(this);
+    this.loadPictures = this.loadPictures.bind(this);
+    this.picturesScroll = this.picturesScroll.bind(this);
+    this.setFilter = this.setFilter.bind(this);
+
+    filters.classList.add('hidden');
+    this.loadPictures();
+
+    filters.addEventListener('change', this.setFilter, true);
+    window.addEventListener('scroll', this.checkPosition);
+  };
+
   /**
    * Показывает загруженные изображения, callback функции load
    * @param {Picture[]} pictures
    */
-  function showPictures(pictures) {
+  Pictures.prototype.showPictures = function(pictures) {
     var fragment = document.createDocumentFragment();
     window.pictures = pictures;
 
@@ -31,23 +44,33 @@ define(['./load', './picture', './gallery'], function(load, Picture, Gallery) {
     picturesContainer.appendChild(fragment);
     Gallery.setPictures(pictures);
     filters.classList.remove('hidden');
-  }
+  };
+
+  Pictures.prototype.setFilter = function(evt) {
+    if (event.target.tagName.toLowerCase() === 'input') {
+      currentPage = 0;
+      filterValue = evt.target.value;
+      localStorage.setItem('filter', filterValue);
+      picturesContainer.innerHTML = '';
+      this.loadPictures();
+    }
+  };
 
   /**
    * Догружает следующую пачку фотографий
    */
-  function picturesScroll() {
+  Pictures.prototype.picturesScroll = function() {
     currentPage++;
-    loadPictures();
-  }
+    this.loadPictures();
+  };
 
   /**
    * @return {Boolean} - Возвращает true, когда футер почти появился на экране
    */
-  function getPositionReached() {
+  Pictures.prototype.getPositionReached = function() {
     var footerPosition = footer.getBoundingClientRect();
     return footerPosition.bottom - window.innerHeight - GAP <= 0;
-  }
+  };
 
   /**
    * Проверяет доступность следующей страницы
@@ -55,56 +78,43 @@ define(['./load', './picture', './gallery'], function(load, Picture, Gallery) {
    * @param {Number} pagelist страница
    * @return {Boolean} - Возвращает true, когда страница меньше кол-ва фотографий
    */
-  function isNextPageAvailable(data, pagelist) {
+  Pictures.prototype.isNextPageAvailable = function(data, pagelist) {
     return pagelist < Math.floor(data.length / PAGE_SIZE);
-  }
+  };
 
   /**
    * throttle
    */
-
-  function checkPosition() {
+  Pictures.prototype.checkPosition = function() {
     var date = Date.now();
+
     if(date - lastCheckPositionTime > 100) {
-      if (getPositionReached() && isNextPageAvailable(window.pictures, currentPage)) {
+      if (this.getPositionReached() && this.isNextPageAvailable(window.pictures, currentPage)) {
         clearTimeout(scrollTimeout);
-        var scrollTimeout = setTimeout(picturesScroll, 100);
+        var scrollTimeout = setTimeout(this.picturesScroll, 100);
       }
       lastCheckPositionTime = date;
     }
-  }
+  };
 
   /**
    * Загрузка изображений
    */
-  function loadPictures() {
+  Pictures.prototype.loadPictures = function() {
+    this.setStorageFilter();
     var param = {
       from: currentPage * PAGE_SIZE,
       to: PAGE_SIZE * (currentPage + 1),
       filter: filterValue
     };
-    load('http://localhost:1506/api/pictures', param, showPictures);
-  }
 
-  function setStorageFilter() {
+    load('http://localhost:1506/api/pictures', param, this.showPictures);
+  };
+
+  Pictures.prototype.setStorageFilter = function() {
     filterValue = localStorage.getItem('filter') || 'filter-popular';
     filters.elements['filter-' + filterValue].checked = true;
-  }
+  };
 
-  filters.classList.add('hidden');
-  loadPictures();
-
-  filters.addEventListener('change', function(evt) {
-    if (event.target.tagName.toLowerCase() === 'input') {
-      currentPage = 0;
-      filterValue = evt.target.value;
-      localStorage.setItem('filter', filterValue);
-      picturesContainer.innerHTML = '';
-      loadPictures();
-    }
-  }, true);
-
-  window.addEventListener('scroll', checkPosition);
-
-  return setStorageFilter();
+  return new Pictures();
 });
