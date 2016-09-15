@@ -112,14 +112,6 @@ define(function() {
 
       this._ctx.drawImage(this._image, displX, displY);
 
-      // Отрисовка прямоугольника, обозначающего область изображения после
-      // кадрирования. Координаты задаются от центра.
-      this._ctx.strokeRect(
-          (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2,
-          (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2,
-          this._resizeConstraint.side - this._ctx.lineWidth / 2,
-          this._resizeConstraint.side - this._ctx.lineWidth / 2);
-
       var coordinateSquareX = (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2 - this._ctx.lineWidth;
       var coordinateSquareY = (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2 - this._ctx.lineWidth;
       var coordinateSquareAspect = (this._resizeConstraint.side - this._ctx.lineWidth / 2) / 2;
@@ -152,7 +144,33 @@ define(function() {
       // 0 0 находится в левом верхнем углу холста, в противном случае
       // некорректно сработает даже очистка холста или нужно будет использовать
       // сложные рассчеты для координат прямоугольника, который нужно очистить.
+      var startPoint = (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2;
+      var staticStartPoint = startPoint;
+      var endPoint = this._resizeConstraint.side / 2 - this._ctx.lineWidth;
+      var staticEndPoint = endPoint;
+      var DOT_MARGIN = 6;
+
+      var fullSideLength = this._resizeConstraint.side + this._ctx.lineWidth / 2;
+      var integerIterations = Math.round((fullSideLength - this._ctx.lineWidth) / (this._ctx.lineWidth + DOT_MARGIN));
+      var correctMargin = (fullSideLength - (integerIterations + 1) * this._ctx.lineWidth) / integerIterations + this._ctx.lineWidth;
+
+      this._ctx.fillStyle = '#ffe753';
+      while (startPoint < this._resizeConstraint.side / 2 - this._ctx.lineWidth) {
+        this._drawPoint(startPoint, staticStartPoint);
+        this._drawPoint(staticEndPoint, startPoint);
+        this._drawPoint(endPoint, staticEndPoint);
+        this._drawPoint(staticStartPoint, endPoint);
+
+        startPoint += correctMargin;
+        endPoint -= correctMargin;
+      }
       this._ctx.restore();
+    },
+
+    _drawPoint: function(x, y) {
+      this._ctx.beginPath();
+      this._ctx.arc(x, y, this._ctx.lineWidth / 2, 0, 2 * Math.PI);
+      this._ctx.fill();
     },
 
     /**
