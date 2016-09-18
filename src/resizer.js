@@ -115,6 +115,8 @@ define(function() {
       var coordinateSquareX = (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2 - this._ctx.lineWidth;
       var coordinateSquareY = (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2 - this._ctx.lineWidth;
       var coordinateSquareAspect = (this._resizeConstraint.side - this._ctx.lineWidth / 2) / 2;
+      var positive = this._resizeConstraint.side / 2;
+      var negative = -this._resizeConstraint.side / 2;
 
       this._ctx.beginPath();
       this._ctx.moveTo(coordinateSquareX, coordinateSquareY);
@@ -138,39 +140,42 @@ define(function() {
       this._ctx.fillStyle = '#fff';
       this._ctx.fillText( this._image.naturalWidth + ' x ' + this._image.naturalHeight, 0, coordinateSquareY - this._ctx.lineWidth);
 
+      //== Отрисовка ромбовидной границы ==
+      this._ctx.lineWidth = 3;
+      this._ctx.strokeStyle = '#ffe753';
+      this._ctx.lineDashOffset = 0;
+      this._ctx.setLineDash([0, 0]);
+
+      for (var n = 0; n < this._resizeConstraint.side - 10; n += 10) {
+        this._ctx.beginPath();
+        this._drawLeftStick(negative, negative, n);
+        this._drawLeftStick(negative, positive, n);
+        this._drawRightStick(negative, negative, n);
+        this._drawRightStick(positive, negative, n);
+      }
+
+
       // Восстановление состояния канваса, которое было до вызова ctx.save
       // и последующего изменения системы координат. Нужно для того, чтобы
       // следующий кадр рисовался с привычной системой координат, где точка
       // 0 0 находится в левом верхнем углу холста, в противном случае
       // некорректно сработает даже очистка холста или нужно будет использовать
       // сложные рассчеты для координат прямоугольника, который нужно очистить.
-      var startPoint = (-this._resizeConstraint.side / 2) - this._ctx.lineWidth / 2;
-      var staticStartPoint = startPoint;
-      var endPoint = this._resizeConstraint.side / 2 - this._ctx.lineWidth;
-      var staticEndPoint = endPoint;
-      var DOT_MARGIN = 6;
-
-      var fullSideLength = this._resizeConstraint.side + this._ctx.lineWidth / 2;
-      var integerIterations = Math.round((fullSideLength - this._ctx.lineWidth) / (this._ctx.lineWidth + DOT_MARGIN));
-      var correctMargin = (fullSideLength - (integerIterations + 1) * this._ctx.lineWidth) / integerIterations + this._ctx.lineWidth;
-
-      this._ctx.fillStyle = '#ffe753';
-      while (startPoint < this._resizeConstraint.side / 2 - this._ctx.lineWidth) {
-        this._drawPoint(startPoint, staticStartPoint);
-        this._drawPoint(staticEndPoint, startPoint);
-        this._drawPoint(endPoint, staticEndPoint);
-        this._drawPoint(staticStartPoint, endPoint);
-
-        startPoint += correctMargin;
-        endPoint -= correctMargin;
-      }
       this._ctx.restore();
     },
 
-    _drawPoint: function(x, y) {
-      this._ctx.beginPath();
-      this._ctx.arc(x, y, this._ctx.lineWidth / 2, 0, 2 * Math.PI);
-      this._ctx.fill();
+    _drawLeftStick: function(x, y, n) {
+      this._ctx.moveTo(x + n, y);
+      this._ctx.lineTo(x + n + 5, y - 5);
+      this._ctx.lineTo(x + n + 10, y);
+      this._ctx.stroke();
+    },
+
+    _drawRightStick: function(x, y, n) {
+      this._ctx.moveTo(x, y + n);
+      this._ctx.lineTo(x - 5, y + n + 5);
+      this._ctx.lineTo(x, y + n + 10);
+      this._ctx.stroke();
     },
 
     /**
