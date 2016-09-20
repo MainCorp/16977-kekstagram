@@ -37,14 +37,19 @@ define(['./load-image', './gallery'], function(loadImage, Gallery) {
 
     this.onSwitchActiviyGallery = function(evt) {
       evt.preventDefault();
-      Gallery.show(this.index);
-    }.bind(this);
+    };
+    this.changeUrl = this.changeUrl.bind(this);
 
     this.element.addEventListener('click', this.onSwitchActiviyGallery);
+    this.element.addEventListener('click', this.changeUrl);
   };
 
   Picture.prototype.remove = function() {
-    this.element.removeEventListener('click', this.onSwitchActiviyGallery);
+    this.element.removeEventListener('click', this.changeUrl);
+  };
+
+  Picture.prototype.changeUrl = function() {
+    Gallery.changeUrl(this.data.url);
   };
 
   if ('content' in templateElement) {

@@ -42,6 +42,7 @@ define(['./load', './throttle', './picture', './gallery'], function(load, thrott
 
     picturesContainer.appendChild(fragment);
     Gallery.setPictures(pictures);
+    Gallery.onHashChange();
     filters.classList.remove('hidden');
   };
 
