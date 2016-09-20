@@ -12,6 +12,10 @@ define(function() {
     this.galleryImage = this.galleryOverlay.querySelector('.gallery-overlay-image');
     this.countLikes = this.galleryOverlay.querySelector('.likes-count');
     this.countComments = this.galleryOverlay.querySelector('.comments-count');
+    this.onHashChange = this.onHashChange.bind(this);
+    this.changeUrl = this.changeUrl.bind(this);
+
+    window.addEventListener('hashchange', this.onHashChange);
   };
 
   /**
@@ -27,15 +31,15 @@ define(function() {
    */
   Gallery.prototype.show = function(num) {
     this.setActivePicture(num);
-
     this.galleryClose.onclick = this.hide.bind(this);
 
     this.galleryImage.onclick = function() {
       if (this.activePicture < this.pictures.length - 1) {
-        this.setActivePicture(this.activePicture + 1);
+        this.changeUrl(window.pictures[this.activePicture + 1].url);
       } else {
-        this.setActivePicture(0);
+        this.changeUrl(window.pictures[0].url);
       }
+
     }.bind(this);
 
     this.galleryOverlay.classList.remove('invisible');
@@ -45,9 +49,42 @@ define(function() {
    * Скрывает галлерею
    */
   Gallery.prototype.hide = function() {
+    window.location.hash = '';
+
     this.galleryOverlay.classList.add('invisible');
     this.galleryClose.onclick = null;
     this.galleryImage.onclick = null;
+  };
+
+  Gallery.prototype.URL_MATCHER = /#photo\/(\S+)/;
+
+  Gallery.prototype.onHashChange = function() {
+    var photoUrl;
+    var urlMatchHash = this.URL_MATCHER.exec(window.location.hash);
+    var pictureIndex;
+
+    if(urlMatchHash) {
+      photoUrl = urlMatchHash[1];
+      this.pictures.forEach(function(pictureObject, pictureNumber) {
+        if(photoUrl === pictureObject.url) {
+          pictureIndex = pictureNumber;
+        }
+      });
+
+      if(pictureIndex || pictureIndex === 0) {
+        this.show(pictureIndex);
+      }
+    } else {
+      this.hide();
+    }
+  };
+
+  Gallery.prototype.changeUrl = function(photoUrl) {
+    if(photoUrl) {
+      window.location.hash = 'photo/' + photoUrl;
+    } else {
+      window.location.hash = '';
+    }
   };
 
   /**
