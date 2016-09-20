@@ -1,10 +1,9 @@
 'use strict';
-define(['./load', './picture', './gallery'], function(load, Picture, Gallery) {
+define(['./load', './throttle', './picture', './gallery'], function(load, throttle, Picture, Gallery) {
 
   var picturesContainer = document.querySelector('.pictures');
   var filters = document.querySelector('.filters');
   var currentPage = 0;
-  var lastCheckPositionTime = 0;
   var footer = document.querySelector('.footer');
   var filterValue = filters.querySelector('input:checked').value;
 
@@ -24,7 +23,7 @@ define(['./load', './picture', './gallery'], function(load, Picture, Gallery) {
     this.loadPictures();
 
     filters.addEventListener('change', this.setFilter, true);
-    window.addEventListener('scroll', this.checkPosition);
+    window.addEventListener('scroll', throttle(this.checkPosition, 100));
   };
 
   /**
@@ -61,7 +60,7 @@ define(['./load', './picture', './gallery'], function(load, Picture, Gallery) {
    */
   Pictures.prototype.picturesScroll = function() {
     currentPage++;
-    this.loadPictures();
+    return this.loadPictures();
   };
 
   /**
@@ -86,14 +85,8 @@ define(['./load', './picture', './gallery'], function(load, Picture, Gallery) {
    * throttle
    */
   Pictures.prototype.checkPosition = function() {
-    var date = Date.now();
-
-    if(date - lastCheckPositionTime > 100) {
-      if (this.getPositionReached() && this.isNextPageAvailable(window.pictures, currentPage)) {
-        clearTimeout(scrollTimeout);
-        var scrollTimeout = setTimeout(this.picturesScroll, 100);
-      }
-      lastCheckPositionTime = date;
+    if (this.getPositionReached() && this.isNextPageAvailable(window.pictures, currentPage)) {
+      this.picturesScroll();
     }
   };
 
